@@ -1,1 +1,4 @@
-# Add extra 0 to assembly version
+# Add a new option to disable vr controls (#106)
+* Move to advanced settings tab
+
+#100
