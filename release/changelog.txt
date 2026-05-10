@@ -1,3 +1,1 @@
-# Fix visibility of mounts (#108)
-
-# Add options for horizontal and vertical offset #79 (#107)
+# Disable controllers if there is no interaction profile (#109)
