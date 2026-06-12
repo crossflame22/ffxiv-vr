@@ -1,2 +1,3 @@
-# Add head height offset for first person (#110)
-#76
+# Add alt frame prediction option (#115)
+Workaround to support linux #112
+# Fix case sensitive paths, add cso files (#114)
