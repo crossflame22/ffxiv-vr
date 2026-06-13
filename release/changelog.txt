@@ -1,3 +1,1 @@
-# Add alt frame prediction option (#115)
-Workaround to support linux #112
-# Fix case sensitive paths, add cso files (#114)
+# Fix assembly name #116 (#117)
