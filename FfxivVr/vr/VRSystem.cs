@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace FfxivVR;
 
@@ -42,12 +43,48 @@ public unsafe class VRSystem(
         FBBodyTracking.ExtensionName,
         "XR_EXT_hand_tracking_data_source",
     ];
+    
     public void Initialize()
+    {
+        int retryCount = 0;
+        const int maxRetries = 5;
+        const int delayMs = 1000;
+
+        while (retryCount < maxRetries)
+        {
+            try
+            {
+                InitializeInternal();
+                return; // Success
+            }
+            catch (RetryableVRException ex)
+            {
+                retryCount++;
+                if (retryCount >= maxRetries)
+                {
+                    throw new FatalVRException($"Failed to initialize VR after {maxRetries} retries: {ex.Message}");
+                }
+                logger.Debug($"VR initialization failed, retrying ({retryCount}/{maxRetries}) in {delayMs}ms: {ex.Message}");
+                Thread.Sleep(delayMs);
+            }
+        }
+    }
+
+    private void InitializeInternal()
     {
         ApplicationInfo appInfo = new ApplicationInfo(applicationVersion: 1, engineVersion: 1, apiVersion: 1UL << 48);
         appInfo.SetApplicationName("FFXIV VR");
 
-        var availableExtensions = xr.GetInstanceExtensionProperties(layerName: null);
+        List<ExtensionProperties> availableExtensions;
+        try
+        {
+            availableExtensions = xr.GetInstanceExtensionProperties(layerName: null);
+        }
+        catch (Exception ex) when (ex.Message.Contains("ErrorInstanceLost"))
+        {
+            throw new RetryableVRException($"OpenXR runtime not ready during extension enumeration: {ex.Message}");
+        }
+
         var names = string.Join(",", availableExtensions.Select(e => e.GetExtensionName()).ToList());
 
         logger.Debug($"Available extensions ({availableExtensions.Count}): {names}");

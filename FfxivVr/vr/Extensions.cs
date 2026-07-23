@@ -1,5 +1,6 @@
 using Silk.NET.OpenXR;
 using System;
+using System.Threading;
 
 namespace FfxivVR
 {
@@ -48,5 +49,10 @@ namespace FfxivVR
             return session.Handle == other.Handle;
         }
 
+    }
+
+    internal class RetryableVRException : Exception
+    {
+        public RetryableVRException(string message) : base(message) { }
     }
 }
