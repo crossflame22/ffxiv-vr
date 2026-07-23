@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
     <Version>0.0.73</Version>
@@ -26,13 +26,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <Target Name="CompileShaders" Inputs="shaders\VertexShader.hlsl;shaders\PixelShader.hlsl" BeforeTargets="BeforeResGen" Outputs="shaders\VertexShader.cso;shaders\PixelShader.cso">
+  <!-- Only compile shaders on Windows where fxc.exe is available -->
+  <Target Name="CompileShaders" Inputs="shaders\VertexShader.hlsl;shaders\PixelShader.hlsl" BeforeTargets="BeforeResGen" Outputs="shaders\VertexShader.cso;shaders\PixelShader.cso" Condition="'$(OS)' == 'Windows_NT'">
     <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\fxc.exe&quot; /Fo shaders\VertexShader.cso /T vs_5_0 .\shaders\VertexShader.hlsl" />
     <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\fxc.exe&quot; /Fo shaders\PixelShader.cso /T ps_5_0 .\shaders\PixelShader.hlsl" />
   </Target>
   <ItemGroup>
-    <EmbeddedResource Include=".\shaders\VertexShader.cso" WithCulture="false" Type="Non-Resx" />
-    <EmbeddedResource Include=".\shaders\PixelShader.cso" WithCulture="false" Type="Non-Resx" />
+    <EmbeddedResource Include=".\shaders\VertexShader.cso" WithCulture="false" Type="Non-Resx" Condition="Exists('shaders\VertexShader.cso')" />
+    <EmbeddedResource Include=".\shaders\PixelShader.cso" WithCulture="false" Type="Non-Resx" Condition="Exists('shaders\PixelShader.cso')" />
   </ItemGroup>
   <ItemGroup>
     <IgnoresAccessChecksTo Include="Dalamud" />
